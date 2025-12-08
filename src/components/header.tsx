@@ -8,11 +8,11 @@ export default function Header() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                 Rick & Morty
-              </div>
+              </span>
             </Link>
-            <div className="text-sm text-muted-foreground">Characters Universe Explorer</div>
+            <div className="text-sm sm:text-base text-muted-foreground">Characters Universe Explorer</div>
           </div>
         </div>
       </div>

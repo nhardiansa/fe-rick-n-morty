@@ -6,7 +6,6 @@ import { useCharactersStore } from "@/lib/store/characters"
 export const FilterSection = () => {
 
   const characters = useCharactersStore((state) => state.characters)
-  const setCharacters = useCharactersStore((state) => state.setCharacters)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("All Status")
@@ -15,19 +14,6 @@ export const FilterSection = () => {
 
   const uniqueSpecies = [...new Set(characters.map((c) => c.species))].filter(Boolean)
   const uniqueGenders = [...new Set(characters.map((c) => c.gender))].filter(Boolean)
-
-  const getCharacters = async () => {
-    try {
-      const { results } = await fetchCharacters()
-      setCharacters(results)
-    } catch (error) {
-      console.error("Failed to fetch characters:", error)
-    }
-  }
-
-  useEffect(() => {
-    getCharacters()
-  }, [])
 
   return (
     <div className="mb-8 bg-card border border-border rounded-lg p-6">
@@ -46,7 +32,7 @@ export const FilterSection = () => {
           />
         </div>
 
-        <div className="col-span-2">
+        <div className="col-span-6 sm:col-span-1 lg:col-span-2">
           <label className="text-sm font-medium text-muted-foreground mb-2 block">Status</label>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="bg-input border-border text-foreground w-full">
@@ -61,7 +47,7 @@ export const FilterSection = () => {
           </Select>
         </div>
 
-        <div className="col-span-2">
+        <div className="col-span-6 sm:col-span-1 lg:col-span-2">
           <label className="text-sm font-medium text-muted-foreground mb-2 block">Species</label>
           <Select value={speciesFilter} onValueChange={setSpeciesFilter}>
             <SelectTrigger className="bg-input border-border text-foreground w-full">
@@ -78,7 +64,7 @@ export const FilterSection = () => {
           </Select>
         </div>
 
-        <div className="col-span-2">
+        <div className="col-span-6 sm:col-span-1 lg:col-span-2">
           <label className="text-sm font-medium text-muted-foreground mb-2 block">Gender</label>
           <Select value={genderFilter} onValueChange={setGenderFilter}>
             <SelectTrigger className="bg-input border-border text-foreground w-full">
