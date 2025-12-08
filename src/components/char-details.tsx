@@ -7,57 +7,91 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft } from "lucide-react"
 
-interface Character {
-  id: number
-  name: string
-  status: string
-  species: string
-  type: string
-  gender: string
-  origin: { name: string; url: string }
-  location: { name: string; url: string }
-  image: string
-  episode: string[]
+export interface CharacterDetails {
+  id: number;
+  name: string;
+  status: string;
+  species: string;
+  type: string;
+  gender: string;
+  origin: { name: string; url: string };
+  location: { name: string; url: string };
+  image: string;
+  episode: string[];
 }
 
-interface Episode {
-  id: number
-  name: string
-  episode: string
-  air_date: string
+export interface Episode {
+  id: number;
+  name: string;
+  episode: string;
+  air_date: string;
 }
+
+
 
 export default function CharacterDetail({ characterId }: { characterId: string }) {
-  const [character, setCharacter] = useState<Character | null>(null)
+  const [character, setCharacter] = useState<CharacterDetails | null>(null)
   const [episodes, setEpisodes] = useState<Episode[]>([])
+  const [urls, setUrls] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchCharacterAndEpisodes = async () => {
-      try {
-        setLoading(true)
+  const fetchCharacterAndEpisodes = async () => {
+    try {
+      setLoading(true)
 
-        // Fetch character
-        const charResponse = await fetch(`https://rickandmortyapi.com/api/character/${characterId}`)
-        const charData = await charResponse.json()
-        setCharacter(charData)
+      // Fetch character
+      getCharacterDetail(characterId)
 
-        // Fetch episodes
-        if (charData.episode && charData.episode.length > 0) {
-          const episodeUrls = charData.episode.slice(0, 20)
-          const episodePromises = episodeUrls.map((url: string) => fetch(url).then((res) => res.json()))
-          const episodesData = await Promise.all(episodePromises)
-          setEpisodes(episodesData)
-        }
-      } catch (error) {
-        console.error("Error fetching character details:", error)
-      } finally {
-        setLoading(false)
-      }
+      // Fetch episodes
+      // if (charData.episode && charData.episode.length > 0) {
+      //   const episodeUrls = charData.episode.slice(0, 20)
+      //   const episodePromises = episodeUrls.map((url: string) => fetch(url).then((res) => res.json()))
+      //   const episodesData = await Promise.all(episodePromises)
+      //   setEpisodes(episodesData)
+      // }
+    } catch (error) {
+      console.error("Error fetching character details:", error)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchCharacterAndEpisodes()
   }, [characterId])
+
+  useEffect(() => {
+    getEpisodes()
+  }, [urls])
+
+  const getCharacterDetail = async (id: string) => {
+    try {
+      const response = await fetch(`https://rickandmortyapi.com/api/character/${id}`)
+      const data = await response.json()
+      console.log(data);
+
+      setCharacter(data)
+      setUrls(data.episode)
+
+    } catch (error) {
+      console.error("Error fetching character details:", error)
+    }
+  }
+
+  const getEpisodes = () => {
+
+    if (urls.length === 0) {
+      return
+    }
+
+    const episodePromises = urls.slice(0, 20).map((url: string) => fetch(url).then((res) => res.json()))
+    Promise.all(episodePromises).then((episodesData) => {
+      const sortedEpisodes = episodesData.sort((a, b) => a.id - b.id)
+      setEpisodes(sortedEpisodes)
+    }).catch((error) => {
+      console.error("Error fetching episodes:", error)
+    })
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {

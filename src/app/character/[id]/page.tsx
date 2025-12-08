@@ -1,5 +1,4 @@
 import CharacterDetail from "@/components/char-details"
-import { Suspense } from "react"
 
 interface Props {
   params: Promise<{
@@ -12,9 +11,9 @@ export default async function CharacterPage({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-background">
-      <Suspense fallback={<div className="text-center py-12">Loading character details...</div>}>
-        <CharacterDetail characterId={id} />
-      </Suspense>
+      {/* <Suspense fallback={<div className="text-center py-12">Loading character details...</div>}> */}
+      <CharacterDetail characterId={id} />
+      {/* </Suspense> */}
     </main>
   )
 }
