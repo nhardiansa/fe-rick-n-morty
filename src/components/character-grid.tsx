@@ -15,7 +15,8 @@ export default function CharacterGrid() {
   const [loading, setLoading] = useState(false)
 
   const loadMoreHandler = async () => {
-    console.log(info.next);
+
+    setLoading(true)
 
     if (info.next) {
       // get all query params from next page URL
@@ -43,6 +44,8 @@ export default function CharacterGrid() {
 
       } catch (error) {
         console.error("Failed to fetch characters:", error)
+      } finally {
+        setLoading(false)
       }
 
     }
@@ -50,29 +53,21 @@ export default function CharacterGrid() {
 
   const getCharacters = async () => {
     try {
+      setLoading(true)
       const response = await fetchCharacters()
 
       setInfo(response.info)
       setCharacters(response.results)
     } catch (error) {
       console.error("Failed to fetch characters:", error)
+    } finally {
+      setLoading(false)
     }
   }
 
   useEffect(() => {
     getCharacters()
   }, [])
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin text-4xl mb-4">⚡</div>
-          <p className="text-muted-foreground">Loading the multiverse...</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -131,7 +126,7 @@ export default function CharacterGrid() {
         </div>
 
         {
-          characters.length === 0 && (
+          ((characters.length === 0) && !loading) && (
             <div className="mt-8 text-center text-muted-foreground">
               No characters found.
             </div>
@@ -143,7 +138,7 @@ export default function CharacterGrid() {
           info.next && (
             <div className="mt-8 text-center">
               <Button variant="outline" onClick={() => loadMoreHandler()} disabled={loading}>
-                Load More
+                {loading ? "Loading..." : "Load More"}
               </Button>
             </div>
           )

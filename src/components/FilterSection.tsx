@@ -6,11 +6,13 @@ import { fetchCharacters } from "@/lib/request"
 
 export const FilterSection = () => {
 
-  const { characters, setCharacters, setFilter, filters, setInfo, loading, setLoading } = useCharactersStore((state) => state)
+  const { characters, setCharacters, setFilter, filters, setInfo } = useCharactersStore((state) => state)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("All Status")
   const [genderFilter, setGenderFilter] = useState<string>("All Gender")
+
+  const [loading, setLoading] = useState(false)
 
   const filterHandler = () => {
     const params: Record<string, string> = {}
