@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft } from "lucide-react"
+import { getCharacterDetail, getEpisodes } from "@/lib/request"
 
 export interface CharacterDetails {
   id: number;
@@ -29,69 +30,15 @@ export interface Episode {
 
 
 
-export default function CharacterDetail({ characterId }: { characterId: string }) {
-  const [character, setCharacter] = useState<CharacterDetails | null>(null)
-  const [episodes, setEpisodes] = useState<Episode[]>([])
-  const [urls, setUrls] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const fetchCharacterAndEpisodes = async () => {
-    try {
-      setLoading(true)
-
-      // Fetch character
-      getCharacterDetail(characterId)
-
-      // Fetch episodes
-      // if (charData.episode && charData.episode.length > 0) {
-      //   const episodeUrls = charData.episode.slice(0, 20)
-      //   const episodePromises = episodeUrls.map((url: string) => fetch(url).then((res) => res.json()))
-      //   const episodesData = await Promise.all(episodePromises)
-      //   setEpisodes(episodesData)
-      // }
-    } catch (error) {
-      console.error("Error fetching character details:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchCharacterAndEpisodes()
-  }, [characterId])
-
-  useEffect(() => {
-    getEpisodes()
-  }, [urls])
-
-  const getCharacterDetail = async (id: string) => {
-    try {
-      const response = await fetch(`https://rickandmortyapi.com/api/character/${id}`)
-      const data = await response.json()
-      console.log(data);
-
-      setCharacter(data)
-      setUrls(data.episode)
-
-    } catch (error) {
-      console.error("Error fetching character details:", error)
-    }
-  }
-
-  const getEpisodes = () => {
-
-    if (urls.length === 0) {
-      return
-    }
-
-    const episodePromises = urls.slice(0, 20).map((url: string) => fetch(url).then((res) => res.json()))
-    Promise.all(episodePromises).then((episodesData) => {
-      const sortedEpisodes = episodesData.sort((a, b) => a.id - b.id)
-      setEpisodes(sortedEpisodes)
-    }).catch((error) => {
-      console.error("Error fetching episodes:", error)
-    })
-  }
+export default function CharacterDetail({ characterId, data, eps, lastPage }: { characterId: string, data: CharacterDetails, eps: Episode[], lastPage: number }) {
+  // const [character, setCharacter] = useState<CharacterDetails | null>(null)
+  const character = data
+  const [episodes, setEpisodes] = useState<Episode[]>([
+    ...eps
+  ])
+  const [episodePage, setEpisodePage] = useState(1)
+  const [lastEpisodePage, setLastEpisodePage] = useState(0)
+  const [loading, setLoading] = useState(false)
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -104,15 +51,30 @@ export default function CharacterDetail({ characterId }: { characterId: string }
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin text-4xl mb-4">⚡</div>
-          <p className="text-muted-foreground">Loading character details...</p>
-        </div>
-      </div>
-    )
+  const fetchMoreEpisodes = async () => {
+    if (episodePage >= lastPage) return
+
+    setLoading(true)
+    const nextPage = episodePage + 1
+    try {
+
+      const newEpisodes = await getEpisodes(character!.episode, nextPage)
+
+      console.log(newEpisodes.result?.length);
+
+
+      if (newEpisodes.status && newEpisodes.result) {
+        setEpisodes((prevEpisodes) => [...prevEpisodes, ...newEpisodes.result!])
+        setEpisodePage(nextPage)
+      }
+
+    } catch (error) {
+      console.error("Error fetching more episodes:", error);
+
+      alert("Failed to load more episodes. Please try again later.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (!character) {
@@ -236,13 +198,28 @@ export default function CharacterDetail({ characterId }: { characterId: string }
                       </div>
                     </div>
                   ))}
+
+                  {/* Button to show more episodes */}
+                  {(episodePage < lastPage) && (
+                    <div className="text-center mt-4">
+                      <Button
+                        variant="default"
+                        onClick={fetchMoreEpisodes}
+                      >
+                        {loading ? "Loading..." : "Load More Episodes"}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-muted-foreground">No episodes available.</p>
               )}
-              {character.episode.length > 20 && (
+              {/* {character.episode.length > 20 && (
                 <p className="text-sm text-muted-foreground mt-4">+{character.episode.length - 20} more episodes...</p>
-              )}
+              )} */}
+
+
+
             </CardContent>
           </Card>
         </div>

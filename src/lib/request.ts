@@ -1,3 +1,4 @@
+import { CharacterDetails, Episode } from "@/components/char-details";
 import axios from "axios";
 
 export type RMCharacter = {
@@ -84,3 +85,84 @@ export async function fetchCharacters(
 }
 
 /*=============== DETAIL CHARACTER =============== */
+export const getCharacterDetail = async (
+  id: string
+): Promise<{
+  status: boolean;
+  result: CharacterDetails;
+}> => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/character/${id}`
+    );
+    const data = await response.json();
+    return {
+      status: true,
+      result: data,
+    };
+  } catch (error) {
+    console.error("Error fetching character details:", error);
+    return {
+      status: false,
+      result: {
+        id: 0,
+        name: "",
+        status: "",
+        species: "",
+        type: "",
+        gender: "",
+        episode: [],
+        origin: { name: "", url: "" },
+        location: { name: "", url: "" },
+        image: "",
+      },
+    };
+  }
+};
+
+export const getEpisodes = async (
+  urls: string[],
+  page = 1
+): Promise<{
+  status: boolean;
+  result: Episode[] | null;
+}> => {
+  if (urls.length === 0) {
+    return {
+      status: false,
+      result: null,
+    };
+  }
+
+  const totalEpisodes = urls.length;
+  const startIndex = (page - 1) * 20;
+  const endIndex = Math.min(startIndex + 20, totalEpisodes);
+
+  console.log(
+    "Fetching episodes from index",
+    startIndex,
+    "to",
+    endIndex - 1,
+    "from total",
+    totalEpisodes
+  );
+
+  try {
+    // Fetch episodes but limit to first 20
+    const episodePromises = urls
+      .slice(startIndex, endIndex)
+      .map((url: string) => fetch(url).then((res) => res.json()));
+    const episodesData = await Promise.all(episodePromises);
+    const sortedEpisodes = episodesData.sort((a, b) => a.id - b.id);
+    return {
+      status: true,
+      result: sortedEpisodes,
+    };
+  } catch (error) {
+    console.error("Error fetching episodes:", error);
+    return {
+      status: false,
+      result: null,
+    };
+  }
+};
