@@ -14,7 +14,13 @@ git clone https://github.com/nhardiansa/fe-rick-n-morty.git
 pnpm install
 ```
 
-3. Install the dependencies:
+3. Add .env file:
+
+```bash
+NEXT_PUBLIC_API_BASE_URL=https://rickandmortyapi.com/api
+```
+
+4. Run with this command:
 
 ```bash
 pnpm run dev
