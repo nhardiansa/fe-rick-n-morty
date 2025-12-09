@@ -1,9 +1,10 @@
-import { FilterSection, FilterSectionLoading } from "@/components/FilterSection";
+import { FilterSection } from "@/components/FilterSection";
 import Header from "@/components/header";
 import { ListCharacterGrid } from "@/components/ListCharacterGrid";
 import ResultCount from "@/components/ResultCount";
 import { fetchCharacters } from "@/lib/request";
-import { Suspense } from "react";
+
+export const runtime = 'edge';
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const filters = await searchParams;
@@ -45,3 +46,4 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
     </main>
   );
 }
+
