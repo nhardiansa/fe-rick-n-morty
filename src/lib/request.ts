@@ -89,9 +89,9 @@ export interface CharacterDetails {
   id: number;
   name: string;
   status: string;
-  species: string;
-  type: string;
-  gender: string;
+  species: string | null;
+  type: string | null;
+  gender: string | null;
   origin: { name: string; url: string };
   location: { name: string; url: string };
   image: string;

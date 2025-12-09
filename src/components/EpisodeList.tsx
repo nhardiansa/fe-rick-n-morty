@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { getEpisodes } from '@/lib/request'
 import { Button } from './ui/button'
@@ -10,14 +10,12 @@ interface EpisodeList {
   totalEpisodes: number
 }
 
-function EpisodeList({ characterDetails, eps, lastPage }: { characterDetails: CharacterDetails, eps: Episode[], lastPage: number }) {
+function EpisodeList({ character, episodes }: { character: CharacterDetails, episodes: Episode[] }) {
 
-  const character = characterDetails
-  const [episodes, setEpisodes] = useState<Episode[]>([
-    ...eps
-  ])
   const [episodePage, setEpisodePage] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [lastPage, setLastPage] = useState(1)
+  const [episodesList, setEpisodesList] = useState<Episode[]>(episodes)
 
   const fetchMoreEpisodes = async () => {
     if (episodePage >= lastPage) return
@@ -32,7 +30,7 @@ function EpisodeList({ characterDetails, eps, lastPage }: { characterDetails: Ch
 
 
       if (newEpisodes.status && newEpisodes.result) {
-        setEpisodes((prevEpisodes) => [...prevEpisodes, ...newEpisodes.result!])
+        setEpisodesList((prevEpisodes) => [...prevEpisodes, ...newEpisodes.result!])
         setEpisodePage(nextPage)
       }
 
@@ -45,15 +43,29 @@ function EpisodeList({ characterDetails, eps, lastPage }: { characterDetails: Ch
     }
   }
 
+  useEffect(() => {
+    if (character?.episode) {
+      const newLastPage = Math.ceil((character.episode.length || 0) / 20)
+      setLastPage(newLastPage)
+    }
+
+  }, [character])
+
+  useEffect(() => {
+    if (episodes.length > 0) {
+      setEpisodesList(episodes)
+    }
+  }, [episodes])
+
   return (
     <Card className="border-border">
       <CardHeader>
-        <CardTitle className="text-foreground">Episodes ({character.episode.length})</CardTitle>
+        <CardTitle className="text-foreground">Episodes ({character?.episode ? character.episode.length : 0})</CardTitle>
       </CardHeader>
       <CardContent>
-        {episodes.length > 0 ? (
+        {episodesList.length > 0 ? (
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {episodes.map((episode) => (
+            {episodesList.map((episode) => (
               <div
                 key={episode.id}
                 className="p-3 bg-muted rounded-lg border border-border hover:border-accent transition-colors"

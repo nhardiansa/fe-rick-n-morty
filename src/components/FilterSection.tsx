@@ -6,9 +6,9 @@ import { CharactersFilter, useCharactersStore } from "@/lib/store/characters"
 import { Button } from "./ui/button"
 import { fetchCharacters } from "@/lib/request"
 import { useRouter } from "next/navigation"
+import { getURLParams } from "@/lib/utils"
 
 export const FilterSection = ({ defaultFilters }: { defaultFilters?: CharactersFilter }) => {
-
   const router = useRouter()
 
   const { setCharacters, setFilter, filters, setInfo } = useCharactersStore((state) => state)
@@ -103,14 +103,25 @@ export const FilterSection = ({ defaultFilters }: { defaultFilters?: CharactersF
       status: "",
       gender: "",
     })
+
+    // Update url to same params
+    const queryString = new URLSearchParams({}).toString()
+    router.push(`/?${queryString}`)
+
   }
 
   useEffect(() => {
-    if (defaultFilters?.name || defaultFilters?.status || defaultFilters?.gender) {
-      setFilter({
-        ...defaultFilters
-      })
-    }
+    const params = getURLParams()
+
+    setSearchQuery(params.name || "")
+    setStatusFilter(params.status || "All Status")
+    setGenderFilter(params.gender || "All Gender")
+    setFilter({
+      gender: params.gender || undefined,
+      name: params.name || "",
+      status: params.status || undefined,
+    })
+
   }, [])
 
 

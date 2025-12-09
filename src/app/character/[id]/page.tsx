@@ -1,31 +1,85 @@
+"use client"
+
 import EpisodeList from "@/components/EpisodeList"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getCharacterDetail, getEpisodes } from "@/lib/request"
+import { CharacterDetails, Episode, getCharacterDetail, getEpisodes } from "@/lib/request"
 import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-
-export const runtime = 'edge';
+import { useParams, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 interface Props {
   params: Promise<{
     id: string
   }>
 }
 
-export default async function CharacterPage({ params }: Props) {
-  const { id } = await params
+export default function CharacterPage() {
+  const params = useParams()
+  const router = useRouter()
 
-  // get Character Details
-  const response = await getCharacterDetail(id)
-  const character = response.result
+  const [character, setCharacter] = useState<CharacterDetails>({
+    name: "",
+    status: "",
+    species: null,
+    type: null,
+    gender: null,
+    episode: [],
+    origin: { name: "", url: "" },
+    location: { name: "", url: "" },
+    image: "",
+    id: 0
+  })
+  const [episodes, setEpisodes] = useState<Episode[]>([])
+  // const [lastPage, setLastPage] = useState<number>(1)
 
-  // Get List Episodes
-  const episodes = await getEpisodes(response.result.episode, 1)
+  const getCharacterDetailData = async (id: string) => {
+    const response = await getCharacterDetail(id)
+    return response.result
+  }
+
+
+  const fetchAllData = async (id: string) => {
+
+    try {
+
+      const characterData = await getCharacterDetailData(id)
+      const episodesResult = await getEpisodes(characterData.episode, 1)
+      setCharacter(characterData)
+      setEpisodes(episodesResult.result || [])
+      // setLastPage(Math.ceil((character.episode.length || 0) / 20))
+    } catch (error) {
+      console.error("Error fetching character details:", error);
+    }
+
+  }
+
+  useEffect(() => {
+    // get id from url first
+    const id = Array.isArray(params.id) ? params.id[0] : params.id;
+
+    if (!id) {
+      router.push("/");
+      return
+    }
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAllData(id)
+  }, [])
+
+
+
+  // // get Character Details
+  // const response = await getCharacterDetail(id)
+  // const character = response.result
+
+  // // Get List Episodes
+  // const episodes = await getEpisodes(response.result.episode, 1)
 
   // Get Last Page
-  const lastPage = Math.ceil((response.result.episode.length || 0) / 20)
+  // const lastPage = Math.ceil((response.result.episode.length || 0) / 20)
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -55,25 +109,48 @@ export default async function CharacterPage({ params }: Props) {
             <Card className="border-border overflow-hidden sticky top-24">
               <CardContent className="p-0">
                 <div className="relative aspect-square overflow-hidden bg-muted">
-                  <Image
-                    src={character.image || "/placeholder.svg"}
-                    alt={character.name}
-                    className="w-full h-full object-cover"
-                    width={800}
-                    height={800}
-                  />
+                  {
+                    character.image === "" ? (
+                      <div className="absolute inset-0 bg-linear-to-t from-card via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    ) : (
+                      <Image
+                        src={character.image}
+                        alt={character.name}
+                        className="w-full h-full object-cover"
+                        width={800}
+                        height={800}
+                      />
+                    )
+                  }
                 </div>
 
                 <div className="p-6 space-y-4">
                   <div>
+                    {
+                      !character.name && (
+                        <div className="h-7 bg-muted animate-pulse w-full rounded-md"></div>
+                      )
+                    }
                     <h1 className="text-2xl font-bold text-foreground mb-2">{character.name}</h1>
+
+                    {
+                      !character.species && (
+                        <div className="h-3 bg-muted animate-pulse w-full rounded-md"></div>
+                      )
+                    }
                     <p className="text-muted-foreground">{character.species}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Badge className={`${getStatusColor(character.status)} border-0 w-full justify-center`}>
-                      {character.status}
-                    </Badge>
+                    {
+                      !character.status ? (
+                        <div className="h-3 bg-muted animate-pulse w-full rounded-md"></div>
+                      ) : (
+                        <Badge className={`${getStatusColor(character.status)} border-0 w-full justify-center`}>
+                          {character.status}
+                        </Badge>
+                      )
+                    }
                   </div>
                 </div>
               </CardContent>
@@ -91,18 +168,42 @@ export default async function CharacterPage({ params }: Props) {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Species</label>
+
+                    {
+                      (!character.species && character.species !== "") && (
+                        <div className="h-5 bg-muted animate-pulse w-[40%] rounded-md"></div>
+                      )
+                    }
                     <p className="text-foreground mt-1">{character.species}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Gender</label>
+                    {
+                      (!character.gender && character.gender !== "") && (
+                        <div className="h-5 bg-muted animate-pulse w-[40%] rounded-md"></div>
+                      )
+                    }
                     <p className="text-foreground mt-1">{character.gender}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Type</label>
-                    <p className="text-foreground mt-1">{character.type || "Unknown"}</p>
+
+                    {
+                      (!character.type && character.type !== "") ? (
+                        <div className="h-5 bg-muted animate-pulse w-[40%] rounded-md"></div>
+                      ) : (
+                        <p className="text-foreground mt-1">{character.type || "Unknown"}</p>
+                      )
+                    }
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Status</label>
+
+                    {
+                      (!character.status && character.status !== "") && (
+                        <div className="h-5 bg-muted animate-pulse w-[40%] rounded-md"></div>
+                      )
+                    }
                     <p className="text-foreground mt-1">{character.status}</p>
                   </div>
                 </div>
@@ -117,17 +218,30 @@ export default async function CharacterPage({ params }: Props) {
               <CardContent className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Current Location</label>
-                  <p className="text-foreground mt-1">{character.location.name}</p>
+                  {
+                    !character.location.name ? (
+                      <div className="h-6 bg-muted animate-pulse w-[35%] rounded-md"></div>
+                    ) : (
+                      <p className="text-foreground mt-1">{character.location.name}</p>
+                    )
+                  }
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Origin</label>
-                  <p className="text-foreground mt-1">{character.origin.name}</p>
+
+                  {
+                    !character.origin.name ? (
+                      <div className="h-6 bg-muted animate-pulse w-[35%] rounded-md"></div>
+                    ) : (
+                      <p className="text-foreground mt-1">{character.origin.name}</p>
+                    )
+                  }
                 </div>
               </CardContent>
             </Card>
 
             {/* Episodes */}
-            <EpisodeList characterDetails={character} eps={episodes?.result?.length ? episodes.result : []} lastPage={lastPage} />
+            <EpisodeList character={character} episodes={episodes} />
           </div>
         </div>
       </div>

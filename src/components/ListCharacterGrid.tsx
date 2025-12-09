@@ -4,10 +4,11 @@ import Link from "next/link"
 import { CharacterCard, CharacterCardLoading } from "./CharacterCard"
 import { useEffect, useState } from "react"
 import { fetchCharacters } from "@/lib/request"
-import { Character, CharactersFilter, CharactersInfo, useCharactersStore } from "@/lib/store/characters"
+import { useCharactersStore } from "@/lib/store/characters"
 import { Button } from "./ui/button"
+import { getURLParams } from "@/lib/utils"
 
-export const ListCharacterGrid = ({ preFetchResult }: { preFetchResult: { results: Character[]; info: CharactersInfo, filters: CharactersFilter } }) => {
+export const ListCharacterGrid = () => {
   const { characters, info, addNewCharacters, setInfo, setCharacters, filters } = useCharactersStore((state) => state)
 
   const [loading, setLoading] = useState(false)
@@ -49,14 +50,29 @@ export const ListCharacterGrid = ({ preFetchResult }: { preFetchResult: { result
     }
   }
 
-  useEffect(() => {
+  const getCharacters = async () => {
 
-    if (preFetchResult && preFetchResult.results.length > 0) {
-      setCharacters(preFetchResult.results)
-      setInfo(preFetchResult.info)
-      return
+    const params = getURLParams()
+
+    try {
+      setLoading(true)
+
+      const charactersResponse = await fetchCharacters({
+        name: params.name || filters.name || "",
+        status: params.status || filters.status || "",
+        gender: params.gender || filters.gender || "",
+      })
+      setInfo(charactersResponse.info)
+      setCharacters(charactersResponse.results)
+    } catch (error) {
+      console.error("Failed to fetch characters:", error)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
+    getCharacters()
   }, [])
 
   return (
