@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend Developer Assessment - Rick and Morty
 
-## Getting Started
+## Setup Instructions
 
-First, run the development server:
+1. First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/nhardiansa/fe-rick-n-morty.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install the dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Install the dependencies:
 
-## Learn More
+```bash
+pnpm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Time Tracking
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Total time spent: 10 hours 50 minutes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Breakdown by Task
 
-## Deploy on Vercel
+#### 1. Setup - 15 minutes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Set up the project and installed dependencies.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### 2. Copying UI and Adjust in Project from v0 - 20 minutes
+
+Migrating UI components and adjusting them into the new project structure.
+
+#### 3. Making Filter for List - 4.5 hours
+
+Implemented the filter functionality for the character list.
+The process involved switching from SSR (Server-Side Rendering) to SSG (Static Site Generation).
+
+#### 4. Making Details Character - 4.6 hours
+
+Created the character detail page. This task included:
+
+- Refactoring code.
+- Moving data-fetching style from SSR to SSG because I failed to build using cloudflare.
+- Implementing features like a loading indicator and ensuring responsiveness.
+
+#### 5. Deployment - 30 minutes
+
+Deployed the application. Initially faced issues with SSR build but resolved them by switching to SSG.
