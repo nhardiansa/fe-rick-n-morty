@@ -2,19 +2,43 @@
 
 import { useEffect, useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { useCharactersStore } from "@/lib/store/characters"
+import { CharactersFilter, useCharactersStore } from "@/lib/store/characters"
 import { Button } from "./ui/button"
 import { fetchCharacters } from "@/lib/request"
+import { useRouter } from "next/navigation"
 
-export const FilterSection = () => {
+export const FilterSection = ({ defaultFilters }: { defaultFilters?: CharactersFilter }) => {
 
-  const { characters, setCharacters, setFilter, filters, setInfo } = useCharactersStore((state) => state)
+  const router = useRouter()
 
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("All Status")
-  const [genderFilter, setGenderFilter] = useState<string>("All Gender")
+  const { setCharacters, setFilter, filters, setInfo } = useCharactersStore((state) => state)
+
+  const [searchQuery, setSearchQuery] = useState(defaultFilters?.name || "")
+  const [statusFilter, setStatusFilter] = useState<string>(defaultFilters?.status || "All Status")
+  const [genderFilter, setGenderFilter] = useState<string>(defaultFilters?.gender || "All Gender")
 
   const [loading, setLoading] = useState(false)
+
+
+  const getFilteredCharacters = async (filter: CharactersFilter) => {
+
+    try {
+      setLoading(true)
+      const charactersResponse = await fetchCharacters({
+        name: filter.name,
+        status: filter.status,
+        gender: filter.gender,
+      })
+
+      setInfo(charactersResponse.info)
+      setCharacters(charactersResponse.results)
+
+    } catch (error) {
+      console.error("Failed to fetch characters:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filterHandler = () => {
     const params: Record<string, string> = {}
@@ -42,32 +66,27 @@ export const FilterSection = () => {
       ...filters,
       ...params,
     })
-  }
 
+    const displayParams: Record<string, string> = {}
 
-  const getFilteredCharacters = async () => {
-
-    try {
-      setLoading(true)
-      const charactersResponse = await fetchCharacters({
-        name: filters.name || "",
-        status: filters.status || "",
-        gender: filters.gender || "",
-      })
-
-      setInfo(charactersResponse.info)
-      setCharacters(charactersResponse.results)
-
-    } catch (error) {
-      console.error("Failed to fetch characters:", error)
-    } finally {
-      setLoading(false)
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== null && value !== "") {
+        displayParams[key] = value;
+      }
     }
-  }
 
-  useEffect(() => {
-    getFilteredCharacters()
-  }, [filters])
+    console.log('asdasdasd', displayParams, params);
+
+    // Update url to same params
+    const queryString = new URLSearchParams(displayParams).toString()
+    router.push(`/?${queryString}`)
+
+    getFilteredCharacters({
+      name: params.name || "",
+      status: params.status || "",
+      gender: params.gender || "",
+    })
+  }
 
   const resetFilters = () => {
     setSearchQuery("")
@@ -78,7 +97,21 @@ export const FilterSection = () => {
       name: "",
       status: undefined,
     })
+
+    getFilteredCharacters({
+      name: "",
+      status: "",
+      gender: "",
+    })
   }
+
+  useEffect(() => {
+    if (defaultFilters?.name || defaultFilters?.status || defaultFilters?.gender) {
+      setFilter({
+        ...defaultFilters
+      })
+    }
+  }, [])
 
 
 
@@ -134,7 +167,7 @@ export const FilterSection = () => {
         <div className="col-span-6">
           <Button variant="default" onClick={filterHandler} className="w-full">
             {
-              loading ? "Applying..." : "Apply Filters"
+              loading ? "Loading..." : "Search"
             }
           </Button>
         </div>
@@ -151,6 +184,31 @@ export const FilterSection = () => {
             </div>
           )
         }
+      </div>
+    </div>
+  )
+}
+
+export const FilterSectionLoading = () => {
+  return (
+    <div className="mb-8 bg-card border border-border rounded-lg p-6">
+      <h2 className="text-lg font-semibold mb-4 text-foreground">Filters</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className="col-span-6 sm:col-span-2 lg:col-span-2">
+          <div className="h-4 bg-muted animate-pulse rounded-full mb-2"></div>
+          <div className="h-9 rounded-md bg-muted animate-pulse"></div>
+        </div>
+        <div className="col-span-6 sm:col-span-2 lg:col-span-2">
+          <div className="h-4 bg-muted animate-pulse rounded-full mb-2"></div>
+          <div className="h-9 rounded-md bg-muted animate-pulse"></div>
+        </div>
+        <div className="col-span-6 sm:col-span-2 lg:col-span-2">
+          <div className="h-4 bg-muted animate-pulse rounded-full mb-2"></div>
+          <div className="h-9 rounded-md bg-muted animate-pulse"></div>
+        </div>
+        <div className="col-span-6">
+          <div className="h-9 rounded-md bg-muted animate-pulse"></div>
+        </div>
       </div>
     </div>
   )

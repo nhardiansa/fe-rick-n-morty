@@ -2,7 +2,7 @@ import { Character } from "@/lib/store/characters"
 import { Badge } from "./ui/badge"
 import { Card, CardContent } from "./ui/card"
 
-export const CharacterCard = ({ character }: { character: Character }) => {
+export const CharacterCard = ({ character, isLoading }: { character: Character, isLoading?: boolean }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Alive":
@@ -14,6 +14,25 @@ export const CharacterCard = ({ character }: { character: Character }) => {
     }
   }
 
+  if (isLoading) {
+    return (
+      <Card className="h-full overflow-hidden border-border hover:border-accent transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 cursor-pointer">
+        <CardContent className="p-0">
+          <div className="relative overflow-hidden bg-muted aspect-square animate-pulse">
+            <div className="absolute inset-0 bg-linear-to-t from-card via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </div>
+
+          <div className="p-4 space-y-3">
+            <div className="h-4 bg-muted animate-pulse" />
+            <div className="h-3 bg-muted animate-pulse" />
+            <div className="h-3 bg-muted animate-pulse" />
+            <div className="h-3 bg-muted animate-pulse" />
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className="h-full overflow-hidden border-border hover:border-accent transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 cursor-pointer">
       <CardContent className="p-0">
@@ -23,7 +42,7 @@ export const CharacterCard = ({ character }: { character: Character }) => {
             alt={character.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-linear-to-t from-card via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         <div className="p-4 space-y-3">
@@ -44,6 +63,25 @@ export const CharacterCard = ({ character }: { character: Character }) => {
           </div>
 
           <p className="text-xs text-muted-foreground pt-2">Appears in {character.episode.length} episodes</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export const CharacterCardLoading = () => {
+  return (
+    <Card className="h-full overflow-hidden border-border hover:border-accent transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 cursor-pointer">
+      <CardContent className="p-0">
+        <div className="relative overflow-hidden bg-muted aspect-square animate-pulse">
+          <div className="absolute inset-0 bg-linear-to-t from-card via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </div>
+
+        <div className="p-4 space-y-3">
+          <div className="h-4 bg-muted animate-pulse" />
+          <div className="h-3 bg-muted animate-pulse" />
+          <div className="h-3 bg-muted animate-pulse" />
+          <div className="h-3 bg-muted animate-pulse" />
         </div>
       </CardContent>
     </Card>

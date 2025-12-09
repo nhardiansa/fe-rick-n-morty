@@ -1,13 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { CharacterCard } from "./CharacterCard"
+import { CharacterCard, CharacterCardLoading } from "./CharacterCard"
 import { useEffect, useState } from "react"
 import { fetchCharacters } from "@/lib/request"
-import { useCharactersStore } from "@/lib/store/characters"
+import { Character, CharactersFilter, CharactersInfo, useCharactersStore } from "@/lib/store/characters"
 import { Button } from "./ui/button"
 
-export const ListCharacterGrid = () => {
+export const ListCharacterGrid = ({ preFetchResult }: { preFetchResult: { results: Character[]; info: CharactersInfo, filters: CharactersFilter } }) => {
   const { characters, info, addNewCharacters, setInfo, setCharacters, filters } = useCharactersStore((state) => state)
 
   const [loading, setLoading] = useState(false)
@@ -49,22 +49,14 @@ export const ListCharacterGrid = () => {
     }
   }
 
-  const getCharacters = async () => {
-    try {
-      setLoading(true)
-      const response = await fetchCharacters()
-
-      setInfo(response.info)
-      setCharacters(response.results)
-    } catch (error) {
-      console.error("Failed to fetch characters:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
-    getCharacters()
+
+    if (preFetchResult && preFetchResult.results.length > 0) {
+      setCharacters(preFetchResult.results)
+      setInfo(preFetchResult.info)
+      return
+    }
+
   }, [])
 
   return (
@@ -75,6 +67,17 @@ export const ListCharacterGrid = () => {
             <CharacterCard character={character} />
           </Link>
         ))}
+
+        {
+          loading && (
+            <>
+              <CharacterCardLoading />
+              <CharacterCardLoading />
+              <CharacterCardLoading />
+              <CharacterCardLoading />
+            </>
+          )
+        }
       </div>
 
       {
@@ -87,7 +90,7 @@ export const ListCharacterGrid = () => {
 
       {/* Button to load more */}
       {
-        info.next && (
+        (info.next && !loading) && (
           <div className="mt-8 text-center">
             <Button variant="outline" onClick={() => loadMoreHandler()} disabled={loading}>
               {loading ? "Loading..." : "Load More"}

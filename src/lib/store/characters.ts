@@ -20,8 +20,8 @@ export interface CharactersInfo {
 
 export interface CharactersFilter {
   name?: string;
-  status?: "Alive" | "Dead" | "unknown";
-  gender?: "Female" | "Male" | "Genderless" | "unknown";
+  status?: "Alive" | "Dead" | "unknown" | string;
+  gender?: "Female" | "Male" | "Genderless" | "unknown" | string;
 }
 
 export const useCharactersStore = create<{

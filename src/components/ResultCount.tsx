@@ -2,13 +2,15 @@
 
 import { useCharactersStore } from "@/lib/store/characters"
 
-function ResultCount() {
+function ResultCount({ isLoading }: { isLoading?: boolean }) {
 
   const { info } = useCharactersStore((state) => state)
 
-  if (!info || info.count === 0) {
+  if (isLoading || !info.count) {
     return (
-      <></>
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-foreground">Loading...</h3>
+      </div>
     )
   }
 
