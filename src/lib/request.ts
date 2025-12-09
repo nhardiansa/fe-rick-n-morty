@@ -71,12 +71,15 @@ export async function fetchCharacters(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     // normalize error for caller
-    if (err.response && err.response.data) {
-      throw new Error(
-        `API Error: ${err.response.status} ${JSON.stringify(err.response.data)}`
-      );
-    }
-    throw new Error(err.message ?? "Unknown error fetching characters");
+    return {
+      info: {
+        count: 0,
+        pages: 0,
+        next: null,
+        prev: null,
+      },
+      results: [],
+    };
   }
 }
 
