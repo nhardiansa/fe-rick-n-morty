@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { useCharactersStore } from "@/lib/store/characters"
@@ -111,23 +113,6 @@ export const FilterSection = () => {
             </SelectContent>
           </Select>
         </div>
-
-        {/* <div className="col-span-6 sm:col-span-1 lg:col-span-2">
-          <label className="text-sm font-medium text-muted-foreground mb-2 block">Species</label>
-          <Select value={speciesFilter} onValueChange={setSpeciesFilter}>
-            <SelectTrigger className="bg-input border-border text-foreground w-full">
-              <SelectValue placeholder="All Species" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All Species">All Species</SelectItem>
-              {uniqueSpecies.map((species) => (
-                <SelectItem key={species} value={species}>
-                  {species}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div> */}
 
         <div className="col-span-6 sm:col-span-1 lg:col-span-2">
           <label className="text-sm font-medium text-muted-foreground mb-2 block">Gender</label>

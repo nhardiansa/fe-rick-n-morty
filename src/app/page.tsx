@@ -1,14 +1,23 @@
-import CharacterGrid from "@/components/character-grid";
+import { FilterSection } from "@/components/FilterSection";
 import Header from "@/components/header";
-// import { Suspense } from "react";
+import { ListCharacterGrid } from "@/components/ListCharacterGrid";
+import ResultCount from "@/components/ResultCount";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       <Header />
-      {/* <Suspense fallback={<div className="text-center py-12">Loading characters...</div>}> */}
-      <CharacterGrid />
-      {/* </Suspense> */}
+      <div className="min-h-screen bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+          <FilterSection />
+
+          <ResultCount />
+
+          <ListCharacterGrid />
+
+        </div>
+      </div>
     </main>
   );
 }
