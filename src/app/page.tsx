@@ -18,8 +18,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
 
   const response = await fetchCharacters(params);
 
-  console.log(response);
-
 
   return (
     <main className="min-h-screen bg-background">
