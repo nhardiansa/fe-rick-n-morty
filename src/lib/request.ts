@@ -1,4 +1,3 @@
-import { CharacterDetails, Episode } from "@/components/char-details";
 import axios from "axios";
 
 export type RMCharacter = {
@@ -85,6 +84,27 @@ export async function fetchCharacters(
 }
 
 /*=============== DETAIL CHARACTER =============== */
+
+export interface CharacterDetails {
+  id: number;
+  name: string;
+  status: string;
+  species: string;
+  type: string;
+  gender: string;
+  origin: { name: string; url: string };
+  location: { name: string; url: string };
+  image: string;
+  episode: string[];
+}
+
+export interface Episode {
+  id: number;
+  name: string;
+  episode: string;
+  air_date: string;
+}
+
 export const getCharacterDetail = async (
   id: string
 ): Promise<{
