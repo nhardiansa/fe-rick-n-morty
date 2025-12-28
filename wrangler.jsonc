@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
-  "name": "rick-n-morty",
+  "name": "fe-rick-n-morty",
   "compatibility_date": "2025-11-17",
   "compatibility_flags": [
     // Enable Node.js API
