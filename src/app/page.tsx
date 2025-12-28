@@ -4,8 +4,6 @@ import { ListCharacterGrid } from "@/components/ListCharacterGrid";
 import ResultCount from "@/components/ResultCount";
 import { fetchCharacters } from "@/lib/request";
 
-export const runtime = 'edge';
-
 export default async function Home({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const filters = await searchParams;
   const params: { [key: string]: string | string[] } = {}
